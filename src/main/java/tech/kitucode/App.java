@@ -81,14 +81,13 @@ public class App {
             requestMap.put("type", "SERVICE");
             requestMap.put("applicationName", app);
             requestMap.put("moduleName", module);
-            requestMap.put("transactionTime", (int) (Math.random() * (100 - 90)) + 90);
-            requestMap.put("totalRequests", (int) (Math.random() * (1000 - 900)) + 900);
-            requestMap.put("successTotal", (int) (Math.random() * (900 - 500)) + 500);
+            requestMap.put("transactionTime", getNumberBetweenAnd(10, 90));
+            requestMap.put("totalRequests", getNumberBetweenAnd(900, 1000));
+            requestMap.put("successTotal", getNumberBetweenAnd(500, 900));
 //            requestMap.put("successTotal", requestMap.get("totalRequests"));
-            requestMap.put("queueSize", (int) (Math.random() * (150 - 100)) + 100);
+            requestMap.put("queueSize", getNumberBetweenAnd(50, 100));
 //            requestMap.put("queueSize", 0);
             requestMap.put("rejectedMessages", 0);
-
             mapList.add(requestMap);
         }
 
@@ -98,5 +97,9 @@ public class App {
         return objectMapper.writeValueAsString(mapList);
     }
 
+
+    private static int getNumberBetweenAnd(int min, int max) {
+        return (int) (Math.random() * (max - min) + min);
+    }
 
 }
