@@ -1,5 +1,7 @@
-package tech.kitucode;
+package tech.kitucode.domain;
 
+
+import tech.kitucode.domain.enumerations.ServiceType;
 
 public class MulikaServiceDTO {
     private ServiceType type;

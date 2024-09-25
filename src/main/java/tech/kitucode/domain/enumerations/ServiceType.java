@@ -1,4 +1,4 @@
-package tech.kitucode;
+package tech.kitucode.domain.enumerations;
 
 /**
  * The ServiceType enumeration.

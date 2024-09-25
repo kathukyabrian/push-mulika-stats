@@ -1,4 +1,6 @@
-package tech.kitucode;
+package tech.kitucode.util;
+
+import tech.kitucode.domain.HTTPResponse;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -9,9 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
-/**
- * @author kamochu
- */
+
 public class HTTPClient {
 
     public static HTTPResponse send(String url, String request, String method, String contentType, Map<String, String> headers, int connectTimeout, int readTimeout) throws IOException {
@@ -31,7 +31,7 @@ public class HTTPClient {
 
             connection = (HttpsURLConnection) obj.openConnection();
 
-            //add reuqest header
+            //add request header
             connection.setRequestMethod(method);
             connection.setRequestProperty("Content-Type", contentType);
             connection.setConnectTimeout(connectTimeout);

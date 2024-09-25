@@ -2,6 +2,8 @@ package tech.kitucode;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import tech.kitucode.domain.HTTPResponse;
+import tech.kitucode.util.HTTPClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -97,9 +99,7 @@ public class App {
         return objectMapper.writeValueAsString(mapList);
     }
 
-
     private static int getNumberBetweenAnd(int min, int max) {
         return (int) (Math.random() * (max - min) + min);
     }
-
 }
