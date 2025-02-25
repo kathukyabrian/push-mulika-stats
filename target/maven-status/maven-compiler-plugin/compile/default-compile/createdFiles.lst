@@ -1,7 +1,0 @@
-tech/kitucode/App.class
-tech/kitucode/Test.class
-tech/kitucode/domain/enumerations/ServiceType.class
-tech/kitucode/util/HTTPClient.class
-tech/kitucode/domain/HTTPResponse.class
-tech/kitucode/domain/MulikaServiceDTO.class
-tech/kitucode/constants/ServiceConstants.class
