@@ -5,7 +5,7 @@
 
   <groupId>tech.kitucode</groupId>
   <artifactId>monitor</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <name>monitor</name>
   <!-- FIXME change it to the project's website -->
@@ -102,6 +102,61 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <from>
+            <image>registry.access.redhat.com/ubi9/openjdk-17:latest</image>
+          </from>
+          <to>
+            <image>melioratech/mulika-reporting</image>
+            <auth>
+              <!--suppress UnresolvedMavenProperty -->
+              <username>${DOCKER_REGISTRY_USER}</username>
+              <!--suppress UnresolvedMavenProperty -->
+              <password>${DOCKER_REGISTRY_PWD}</password>
+            </auth>
+            <tags>
+              <tag>latest</tag>
+              <tag>${version}</tag>
+            </tags>
+          </to>
+          <extraDirectories>
+            <paths>
+              <path>
+                <from>docker/</from>
+                <into>/</into>
+              </path>
+            </paths>
+            <permissions>
+              <permission>
+                <file>/entrypoint.sh</file>
+                <mode>755</mode>
+              </permission>
+            </permissions>
+          </extraDirectories>
+          <container>
+            <entrypoint>
+              <shell>sh</shell>
+              <option>-c</option>
+              <arg>/entrypoint.sh</arg>
+            </entrypoint>
+<!--            <ports>-->
+<!--              <port>20250</port>-->
+<!--            </ports>-->
+            <jvmFlags>
+              <jvmFlag>-server</jvmFlag>
+            </jvmFlags>
+            <environment>
+              <JAVA_OPTS>-Djava.net.preferIPv4Stack=true
+              </JAVA_OPTS>
+            </environment>
+            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+          </container>
+        </configuration>
       </plugin>
     </plugins>
   </build>
