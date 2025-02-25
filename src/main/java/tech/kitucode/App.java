@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import tech.kitucode.constants.ServiceConstants;
 import tech.kitucode.domain.HTTPResponse;
+import tech.kitucode.domain.KPIConfig;
 import tech.kitucode.util.HTTPClient;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Hello world!
@@ -23,6 +25,7 @@ public class App {
     private static String SERVICE_PREFIX = "delay";
     private static String mulikaUrl = "https://mulika.natujenge.ke/api/statistics/report-list";
     private static String mulikaAPIKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwbXV0aXN5YUBtZWxpb3JhLnRlY2giLCJhdXRoIjoiUk9MRV9BUEkiLCJvaWQiOjIsIm90eXBlIjoiQ0xJRU5UIiwiZXhwIjoxOTAxNzgwNDQzfQ.2LdI9Rpu-tu4sN9h3KIGoq61ILdgvj7xQ9Dh_2L3Fei0VutF_JF7UIob5z_OKHV8XWFfW6P1aa0DB2gZH3_iow";
+    private static KPIConfig kpiConfig;
 
     public static void main(String[] args) {
         loadConfig();
@@ -84,6 +87,29 @@ public class App {
             }
         }
 
+        readSystemConfigs(properties);
+
+        readKPIConfigs(properties);
+
+        System.out.println("app = " + app + "|module = " + module + "|reportInterval = " + reportInterval + "|serviceCount = " + SERVICE_COUNT + "" +
+                "|servicePrefix = " + SERVICE_PREFIX + "|mulikaUrl = " + mulikaUrl + "|mulikaAPIKey = " + mulikaAPIKey + "|loaded properties");
+    }
+
+    private static void readKPIConfigs(Properties properties) {
+        kpiConfig = new KPIConfig();
+        kpiConfig.setTotalRequests((Arrays.stream(properties.getProperty(ServiceConstants.TOTAL_REQUESTS_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+        kpiConfig.setSuccessTotal((Arrays.stream(properties.getProperty(ServiceConstants.SUCCESS_TOTAL_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+        kpiConfig.setTransactionTime((Arrays.stream(properties.getProperty(ServiceConstants.TRANSACTION_TIME_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+        kpiConfig.setTotalDeliveries((Arrays.stream(properties.getProperty(ServiceConstants.TOTAL_DELIVERIES_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+        kpiConfig.setQueueSize((Arrays.stream(properties.getProperty(ServiceConstants.QUEUE_SIZE_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+        kpiConfig.setAmount((Arrays.stream(properties.getProperty(ServiceConstants.AMOUNT_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+        kpiConfig.setRejectedMessages((Arrays.stream(properties.getProperty(ServiceConstants.REJECTED_MESSAGES_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+        kpiConfig.setBalance((Arrays.stream(properties.getProperty(ServiceConstants.BALANCE_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+
+        System.out.println("loaded kpi config = " + kpiConfig);
+    }
+
+    private static void readSystemConfigs(Properties properties) {
         app = properties.getProperty(ServiceConstants.APP_CONFIG_KEY);
         module = properties.getProperty(ServiceConstants.MODULE_CONFIG_KEY);
         reportInterval = Integer.parseInt(properties.getProperty(ServiceConstants.REPORT_INTERVAL_CONFIG_KEY));
@@ -91,9 +117,6 @@ public class App {
         SERVICE_PREFIX = properties.getProperty(ServiceConstants.SERVICE_PREFIX_CONFIG_KEY);
         mulikaUrl = properties.getProperty(ServiceConstants.URL_CONFIG_KEY);
         mulikaAPIKey = properties.getProperty(ServiceConstants.API_KEY_CONFIG_KEY);
-
-        System.out.println("app = " + app + "|module = " + module + "|reportInterval = " + reportInterval + "|serviceCount = " + SERVICE_COUNT + "" +
-                "|servicePrefix = "+ SERVICE_PREFIX + "|mulikaUrl = " + mulikaUrl + "|mulikaAPIKey = " + mulikaAPIKey + "|loaded properties");
     }
 
     private static void reportStats() {
@@ -123,17 +146,17 @@ public class App {
             requestMap.put("type", "SERVICE");
             requestMap.put("applicationName", app);
             requestMap.put("moduleName", module);
-            requestMap.put("transactionTime", getNumberBetweenAnd(10, 10));
+            requestMap.put("transactionTime", getNumberBetweenAnd(kpiConfig.getTransactionTime()));
 //            requestMap.put("totalDeliveries", getNumberBetweenAnd(600, 900));
-            requestMap.put("totalRequests", getNumberBetweenAnd(3200, 3200));
-            requestMap.put("totalDeliveries", requestMap.get("totalRequests"));
-            requestMap.put("successTotal", requestMap.get("totalRequests"));
+            requestMap.put("totalRequests", getNumberBetweenAnd(kpiConfig.getTotalRequests()));
+            requestMap.put("totalDeliveries", getNumberBetweenAnd(kpiConfig.getTotalDeliveries()));
+            requestMap.put("successTotal", getNumberBetweenAnd(kpiConfig.getSuccessTotal()));
 //            requestMap.put("successTotal", requestMap.get("totalRequests"));
 //            requestMap.put("queueSize", getNumberBetweenAnd(100, 200));
-            requestMap.put("queueSize", 0);
-            requestMap.put("balance", getNumberBetweenAnd(2000, 2000));
-            requestMap.put("amount", getNumberBetweenAnd(500, 1000));
-            requestMap.put("rejectedMessages", 0);
+            requestMap.put("queueSize", getNumberBetweenAnd(kpiConfig.getQueueSize()));
+            requestMap.put("balance", getNumberBetweenAnd(kpiConfig.getBalance()));
+            requestMap.put("amount", getNumberBetweenAnd(kpiConfig.getAmount()));
+            requestMap.put("rejectedMessages", getNumberBetweenAnd(kpiConfig.getRejectedMessages()));
             mapList.add(requestMap);
         }
 
@@ -145,6 +168,14 @@ public class App {
 
     private static int getNumberBetweenAnd(int min, int max) {
         return (int) (Math.random() * (max - min) + min);
+    }
+
+    private static int getNumberBetweenAnd(List<Integer> valueList) {
+        if (valueList.size() == 2) {
+            return (int) (Math.random() * (valueList.get(1) - valueList.get(0)) + valueList.get(0));
+        }
+
+        return valueList.get(0);
     }
 
 
