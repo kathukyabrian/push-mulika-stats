@@ -146,17 +146,17 @@ public class App {
             requestMap.put("type", "SERVICE");
             requestMap.put("applicationName", app);
             requestMap.put("moduleName", module);
-            requestMap.put("transactionTime", getNumberBetweenAnd(kpiConfig.getTransactionTime()));
+            requestMap.put("transactionTime", getValueFromKPIConfig(kpiConfig.getTransactionTime()));
 //            requestMap.put("totalDeliveries", getNumberBetweenAnd(600, 900));
-            requestMap.put("totalRequests", getNumberBetweenAnd(kpiConfig.getTotalRequests()));
-            requestMap.put("totalDeliveries", getNumberBetweenAnd(kpiConfig.getTotalDeliveries()));
-            requestMap.put("successTotal", getNumberBetweenAnd(kpiConfig.getSuccessTotal()));
+            requestMap.put("totalRequests", getValueFromKPIConfig(kpiConfig.getTotalRequests()));
+            requestMap.put("totalDeliveries", getValueFromKPIConfig(kpiConfig.getTotalDeliveries()));
+            requestMap.put("successTotal", getValueFromKPIConfig(kpiConfig.getSuccessTotal()));
 //            requestMap.put("successTotal", requestMap.get("totalRequests"));
 //            requestMap.put("queueSize", getNumberBetweenAnd(100, 200));
-            requestMap.put("queueSize", getNumberBetweenAnd(kpiConfig.getQueueSize()));
-            requestMap.put("balance", getNumberBetweenAnd(kpiConfig.getBalance()));
-            requestMap.put("amount", getNumberBetweenAnd(kpiConfig.getAmount()));
-            requestMap.put("rejectedMessages", getNumberBetweenAnd(kpiConfig.getRejectedMessages()));
+            requestMap.put("queueSize", getValueFromKPIConfig(kpiConfig.getQueueSize()));
+            requestMap.put("balance", getValueFromKPIConfig(kpiConfig.getBalance()));
+            requestMap.put("amount", getValueFromKPIConfig(kpiConfig.getAmount()));
+            requestMap.put("rejectedMessages", getValueFromKPIConfig(kpiConfig.getRejectedMessages()));
             mapList.add(requestMap);
         }
 
@@ -170,12 +170,27 @@ public class App {
         return (int) (Math.random() * (max - min) + min);
     }
 
-    private static int getNumberBetweenAnd(List<Integer> valueList) {
-        if (valueList.size() == 2) {
-            return (int) (Math.random() * (valueList.get(1) - valueList.get(0)) + valueList.get(0));
+    /**
+     * gets a value from a kpi config
+     * this is a list with 1 or 2 items
+     * if the list has 2 items we get a value between the 2 values
+     * if the list has 1 item we get the single value
+     * if the list is empty return null
+     * @param valueList
+     * @return
+     */
+    private static Integer getValueFromKPIConfig(List<Integer> valueList) {
+        if (valueList == null) {
+            return null;
         }
 
-        return valueList.get(0);
+        if (valueList.size() > 1) {
+            return (int) (Math.random() * (valueList.get(1) - valueList.get(0)) + valueList.get(0));
+        } else if (valueList.size() == 1) {
+            return valueList.get(0);
+        } else {
+            return null;
+        }
     }
 
 
