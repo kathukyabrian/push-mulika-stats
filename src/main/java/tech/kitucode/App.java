@@ -97,14 +97,15 @@ public class App {
 
     private static void readKPIConfigs(Properties properties) {
         kpiConfig = new KPIConfig();
-        kpiConfig.setTotalRequests((Arrays.stream(properties.getProperty(ServiceConstants.TOTAL_REQUESTS_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
-        kpiConfig.setSuccessTotal((Arrays.stream(properties.getProperty(ServiceConstants.SUCCESS_TOTAL_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
-        kpiConfig.setTransactionTime((Arrays.stream(properties.getProperty(ServiceConstants.TRANSACTION_TIME_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
-        kpiConfig.setTotalDeliveries((Arrays.stream(properties.getProperty(ServiceConstants.TOTAL_DELIVERIES_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
-        kpiConfig.setQueueSize((Arrays.stream(properties.getProperty(ServiceConstants.QUEUE_SIZE_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
-        kpiConfig.setAmount((Arrays.stream(properties.getProperty(ServiceConstants.AMOUNT_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
-        kpiConfig.setRejectedMessages((Arrays.stream(properties.getProperty(ServiceConstants.REJECTED_MESSAGES_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
-        kpiConfig.setBalance((Arrays.stream(properties.getProperty(ServiceConstants.BALANCE_KPI_CONFIG).split(",")).map(Integer::parseInt)).collect(Collectors.toList()));
+        kpiConfig.setTotalDeliveries(getRangeForKPI(properties,ServiceConstants.TOTAL_DELIVERIES_KPI_CONFIG));
+        kpiConfig.setTotalRequests(getRangeForKPI(properties,ServiceConstants.TOTAL_REQUESTS_KPI_CONFIG));
+        kpiConfig.setSuccessTotal(getRangeForKPI(properties,ServiceConstants.SUCCESS_TOTAL_KPI_CONFIG));
+        kpiConfig.setTransactionTime(getRangeForKPI(properties,ServiceConstants.TRANSACTION_TIME_KPI_CONFIG));
+        kpiConfig.setTotalDeliveries(getRangeForKPI(properties,ServiceConstants.TOTAL_DELIVERIES_KPI_CONFIG));
+        kpiConfig.setQueueSize(getRangeForKPI(properties,ServiceConstants.QUEUE_SIZE_KPI_CONFIG));
+        kpiConfig.setAmount(getRangeForKPI(properties,ServiceConstants.AMOUNT_KPI_CONFIG));
+        kpiConfig.setRejectedMessages(getRangeForKPI(properties,ServiceConstants.REJECTED_MESSAGES_KPI_CONFIG));
+        kpiConfig.setBalance(getRangeForKPI(properties,ServiceConstants.BALANCE_KPI_CONFIG));
 
         System.out.println("loaded kpi config = " + kpiConfig);
     }
@@ -193,5 +194,9 @@ public class App {
         }
     }
 
+
+    private static List<Integer> getRangeForKPI(Properties properties, String kpi){
+        return Arrays.stream(properties.getProperty(kpi).split(",")).map(value -> value.trim()).map(Integer::parseInt).toList();
+    }
 
 }
