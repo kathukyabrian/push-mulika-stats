@@ -113,12 +113,12 @@ public class MulikaServiceDTO {
     @Override
     public String toString() {
         return "MulikaServiceDTO{" +
-            "name='" + name + '\'' +
-            ", totalRequests=" + totalRequests +
-            ", successTotal=" + successTotal +
-            ", rejectedMessages=" + rejectedMessages +
-            ", queueSize=" + queueSize +
-            ", transactionTime=" + transactionTime +
-            '}';
+                "name='" + name + '\'' +
+                ", totalRequests=" + totalRequests +
+                ", successTotal=" + successTotal +
+                ", rejectedMessages=" + rejectedMessages +
+                ", queueSize=" + queueSize +
+                ", transactionTime=" + transactionTime +
+                '}';
     }
 }

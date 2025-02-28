@@ -1,22 +1,17 @@
-package tech.kitucode;
+package tech.kitucode.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tech.kitucode.App;
 import tech.kitucode.constants.ServiceConstants;
-import tech.kitucode.domain.HTTPResponse;
 import tech.kitucode.domain.KPIConfig;
-import tech.kitucode.util.HTTPClient;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
-/**
- * Hello world!
- */
-public class App {
-    private static Thread   mulikaThread;
+public class ConfigUtil {
     private static String app = "default";
     private static String module = "default";
     private static int reportInterval = 60000;
@@ -26,42 +21,8 @@ public class App {
     private static String mulikaAPIKey = null;
     private static KPIConfig kpiConfig;
 
-    public static void main(String[] args) {
-        loadConfig();
-
-        System.out.println("About to start stats push thread");
-        mulikaThread = new Thread(() -> {
-            while (true) {
-                try {
-                    try {
-                        System.out.println("About to sleep for " + reportInterval + " milliseconds");
-                        Thread.sleep(reportInterval);
-                    } catch (InterruptedException ex) {
-                        System.out.println("Thread could not sleep. trying again " + ex);
-                        Thread.sleep(reportInterval);
-                    }
-
-                    reportStats();
-
-                } catch (InterruptedException e) {
-                    System.out.println("received an interrupt signal " + e);
-                    break;
-                } catch (Exception ex) {
-                    System.out.println("Encountered exception. Proceeding " + ex);
-                }
-            }
-        }, "mulika-thread");
-
-        System.out.println("Successfully initialized mulika thread");
-
-        mulikaThread.start();
-
-        System.out.println("Successfully started mulika thread. mulikaUrl = " + mulikaUrl + ", mulikaAPIKey = " + mulikaAPIKey);
-    }
-
-    private static void loadConfig() {
+    public static void loadConfig() {
         // load from environment variable
-
         Properties properties = new Properties();
         String fileName = System.getenv().get("MULIKA_REPORTING_CONFIG");
         if (fileName != null) {
@@ -115,54 +76,7 @@ public class App {
         serviceCount = Integer.parseInt(properties.getProperty(ServiceConstants.SERVICE_COUNT_CONFIG_KEY), serviceCount);
         servicePrefix = properties.getProperty(ServiceConstants.SERVICE_PREFIX_CONFIG_KEY, servicePrefix);
         mulikaUrl = properties.getProperty(ServiceConstants.URL_CONFIG_KEY, mulikaUrl);
-        mulikaAPIKey = properties.getProperty(ServiceConstants.API_KEY_CONFIG_KEY);
-    }
-
-    private static void reportStats() {
-        try {
-            String jsonRequest = getRequests();
-
-            Map<String, String> headers = new HashMap<>();
-            headers.put("Authorization", "Bearer " + mulikaAPIKey.trim());
-            headers.put("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-
-            HTTPResponse response = HTTPClient.send(mulikaUrl, jsonRequest, "POST", "application/json", headers, 5000, 120000);
-
-            System.out.println("mulika|" + "|request :" + jsonRequest + "|response : " + response + "|stats sent");
-        } catch (IOException e) {
-            System.out.println("mulika|Encountered exception" + e);
-        }
-    }
-
-    private static String getRequests() throws JsonProcessingException {
-        List<Map<String, Object>> mapList = new ArrayList<>();
-
-        for (int i = 0; i <= serviceCount; i++) {
-            Map<String, Object> requestMap = new HashMap<>();
-            String serviceName = servicePrefix + "-" + i;
-            requestMap.put("id", serviceName);
-            requestMap.put("name", serviceName);
-            requestMap.put("type", "SERVICE");
-            requestMap.put("applicationName", app);
-            requestMap.put("moduleName", module);
-            requestMap.put("transactionTime", getValueFromKPIConfig(kpiConfig.getTransactionTime()));
-//            requestMap.put("totalDeliveries", getNumberBetweenAnd(600, 900));
-            requestMap.put("totalRequests", getValueFromKPIConfig(kpiConfig.getTotalRequests()));
-            requestMap.put("totalDeliveries", getValueFromKPIConfig(kpiConfig.getTotalDeliveries()));
-            requestMap.put("successTotal", getValueFromKPIConfig(kpiConfig.getSuccessTotal()));
-//            requestMap.put("successTotal", requestMap.get("totalRequests"));
-//            requestMap.put("queueSize", getNumberBetweenAnd(100, 200));
-            requestMap.put("queueSize", getValueFromKPIConfig(kpiConfig.getQueueSize()));
-            requestMap.put("balance", getValueFromKPIConfig(kpiConfig.getBalance()));
-            requestMap.put("amount", getValueFromKPIConfig(kpiConfig.getAmount()));
-            requestMap.put("rejectedMessages", getValueFromKPIConfig(kpiConfig.getRejectedMessages()));
-            mapList.add(requestMap);
-        }
-
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        return objectMapper.writeValueAsString(mapList);
+        mulikaAPIKey = properties.getProperty(ServiceConstants.API_KEY_CONFIG_KEY, mulikaAPIKey);
     }
 
     private static int getNumberBetweenAnd(int min, int max) {
@@ -193,17 +107,41 @@ public class App {
         }
     }
 
-
-    /**
-     * given properties and a kpi config key, get a list with the range of values set
-     * returns a list with 0 or more items
-     *
-     * @param properties
-     * @param kpi
-     * @return List<Integer>
-     */
     private static List<Integer> getRangeForKPI(Properties properties, String kpi) {
         return Arrays.stream(properties.getProperty(kpi).split(",")).map(value -> value.trim()).map(Integer::parseInt).toList();
     }
 
+    // getters
+
+    public static String getApp() {
+        return app;
+    }
+
+    public static String getModule() {
+        return module;
+    }
+
+    public static int getReportInterval() {
+        return reportInterval;
+    }
+
+    public static int getServiceCount() {
+        return serviceCount;
+    }
+
+    public static String getServicePrefix() {
+        return servicePrefix;
+    }
+
+    public static String getMulikaUrl() {
+        return mulikaUrl;
+    }
+
+    public static String getMulikaAPIKey() {
+        return mulikaAPIKey;
+    }
+
+    public static KPIConfig getKpiConfig() {
+        return kpiConfig;
+    }
 }

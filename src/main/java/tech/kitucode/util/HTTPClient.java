@@ -98,7 +98,7 @@ public class HTTPClient {
 
     public static HTTPResponse sendGet(String url) throws Exception {
         HttpURLConnection httpClient =
-            (HttpURLConnection) new URL(url).openConnection();
+                (HttpURLConnection) new URL(url).openConnection();
 
         // optional default is GET
         httpClient.setRequestMethod("GET");
@@ -110,7 +110,7 @@ public class HTTPClient {
 
         StringBuilder response = new StringBuilder();
         try (BufferedReader in = new BufferedReader(
-            new InputStreamReader(httpClient.getInputStream()))) {
+                new InputStreamReader(httpClient.getInputStream()))) {
             String line;
 
             while ((line = in.readLine()) != null) {
