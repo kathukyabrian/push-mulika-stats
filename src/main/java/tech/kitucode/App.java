@@ -24,7 +24,7 @@ public class App {
     private static int SERVICE_COUNT = 1;
     private static String SERVICE_PREFIX = "delay";
     private static String mulikaUrl = "https://mulika.natujenge.ke/api/statistics/report-list";
-    private static String mulikaAPIKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwbXV0aXN5YUBtZWxpb3JhLnRlY2giLCJhdXRoIjoiUk9MRV9BUEkiLCJvaWQiOjIsIm90eXBlIjoiQ0xJRU5UIiwiZXhwIjoxOTAxNzgwNDQzfQ.2LdI9Rpu-tu4sN9h3KIGoq61ILdgvj7xQ9Dh_2L3Fei0VutF_JF7UIob5z_OKHV8XWFfW6P1aa0DB2gZH3_iow";
+    private static String mulikaAPIKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJia2l0dW5kYUBtZWxpb3JhLnRlY2giLCJhdXRoIjoiUk9MRV9BUEkiLCJvaWQiOjIsIm90eXBlIjoiQ0xJRU5UIiwidWlkIjoxMDAsImV4cCI6MjA1NjA4NzM4N30.6UduOBy-zHP5gZVCVngPpItnyN74aQ-M8kPodjjEpF1gm1pb-WHCBoPjeFJ0JneQyVluNWaBhqCI4n8JPToIgA";
     private static KPIConfig kpiConfig;
 
     public static void main(String[] args) {
