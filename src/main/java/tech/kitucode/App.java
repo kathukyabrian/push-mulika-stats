@@ -16,7 +16,7 @@ import java.util.*;
  * Hello world!
  */
 public class App {
-    private static Thread   mulikaThread;
+    private static Thread mulikaThread;
     private static String app = "default";
     private static String module = "default";
     private static int reportInterval = 60000;
@@ -89,7 +89,7 @@ public class App {
 
         readKPIConfigs(properties);
 
-        System.out.println("app = " + app + "|module = " + module + "|reportInterval = " + reportInterval + "|serviceCount = " + serviceCount + "" +
+        System.out.println("app = " + app + "|module = " + module + "|reportInterval = " + reportInterval + "|serviceCount = " + serviceCount +
                 "|servicePrefix = " + servicePrefix + "|mulikaUrl = " + mulikaUrl + "|mulikaAPIKey = " + mulikaAPIKey + "|loaded properties");
     }
 
@@ -145,17 +145,14 @@ public class App {
             requestMap.put("type", "SERVICE");
             requestMap.put("applicationName", app);
             requestMap.put("moduleName", module);
-            requestMap.put("transactionTime", getValueFromKPIConfig(kpiConfig.getTransactionTime()));
-//            requestMap.put("totalDeliveries", getNumberBetweenAnd(600, 900));
-            requestMap.put("totalRequests", getValueFromKPIConfig(kpiConfig.getTotalRequests()));
-            requestMap.put("totalDeliveries", getValueFromKPIConfig(kpiConfig.getTotalDeliveries()));
-            requestMap.put("successTotal", getValueFromKPIConfig(kpiConfig.getSuccessTotal()));
-//            requestMap.put("successTotal", requestMap.get("totalRequests"));
-//            requestMap.put("queueSize", getNumberBetweenAnd(100, 200));
-            requestMap.put("queueSize", getValueFromKPIConfig(kpiConfig.getQueueSize()));
-            requestMap.put("balance", getValueFromKPIConfig(kpiConfig.getBalance()));
-            requestMap.put("amount", getValueFromKPIConfig(kpiConfig.getAmount()));
-            requestMap.put("rejectedMessages", getValueFromKPIConfig(kpiConfig.getRejectedMessages()));
+            requestMap.put(ServiceConstants.TRANSACTION_TIME_KPI, getValueFromKPIConfig(kpiConfig.getTransactionTime()));
+            requestMap.put(ServiceConstants.TOTAL_DELIVERIES_KPI, getValueFromKPIConfig(kpiConfig.getTotalDeliveries()));
+            requestMap.put(ServiceConstants.TOTAL_REQUESTS_KPI, getValueFromKPIConfig(kpiConfig.getTotalRequests()));
+            requestMap.put(ServiceConstants.SUCCESS_TOTAL_KPI, getValueFromKPIConfig(kpiConfig.getSuccessTotal()));
+            requestMap.put(ServiceConstants.QUEUE_SIZE_KPI, getValueFromKPIConfig(kpiConfig.getQueueSize()));
+            requestMap.put(ServiceConstants.BALANCE_KPI, getValueFromKPIConfig(kpiConfig.getBalance()));
+            requestMap.put(ServiceConstants.AMOUNT_KPI, getValueFromKPIConfig(kpiConfig.getAmount()));
+            requestMap.put(ServiceConstants.REJECTED_MESSAGES_KPI, getValueFromKPIConfig(kpiConfig.getRejectedMessages()));
             mapList.add(requestMap);
         }
 
@@ -165,9 +162,6 @@ public class App {
         return objectMapper.writeValueAsString(mapList);
     }
 
-    private static int getNumberBetweenAnd(int min, int max) {
-        return (int) (Math.random() * (max - min) + min);
-    }
 
     /**
      * gets a value from a kpi config
@@ -176,8 +170,8 @@ public class App {
      * if the list has 1 item we get the single value
      * if the list is empty return null
      *
-     * @param valueList
-     * @return
+     * @param valueList - range list for a given kpi
+     * @return Integer
      */
     private static Integer getValueFromKPIConfig(List<Integer> valueList) {
         if (valueList == null) {
@@ -198,7 +192,7 @@ public class App {
      * given properties and a kpi config key, get a list with the range of values set
      * returns a list with 0 or more items
      *
-     * @param properties
+     * @param properties - configured application properties
      * @param kpi
      * @return List<Integer>
      */

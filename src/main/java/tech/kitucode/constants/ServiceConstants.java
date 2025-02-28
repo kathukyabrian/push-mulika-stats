@@ -21,4 +21,13 @@ public class ServiceConstants {
     public static final String BALANCE_KPI_CONFIG = "balance";
     public static final String AMOUNT_KPI_CONFIG = "amount";
     public static final String REJECTED_MESSAGES_KPI_CONFIG = "rejected-messages";
+
+    public static final String TRANSACTION_TIME_KPI = "transactionTime";
+    public static final String TOTAL_DELIVERIES_KPI = "totalDeliveries";
+    public static final String TOTAL_REQUESTS_KPI = "totalRequests";
+    public static final String SUCCESS_TOTAL_KPI = "successTotal";
+    public static final String QUEUE_SIZE_KPI = "queueSize";
+    public static final String BALANCE_KPI = "balance";
+    public static final String AMOUNT_KPI = "amount";
+    public static final String REJECTED_MESSAGES_KPI = "rejectedMessages";
 }
