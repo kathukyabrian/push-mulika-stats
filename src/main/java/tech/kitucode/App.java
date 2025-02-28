@@ -2,6 +2,8 @@ package tech.kitucode;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.kitucode.constants.ServiceConstants;
 import tech.kitucode.domain.HTTPResponse;
 import tech.kitucode.domain.KPIConfig;
@@ -25,38 +27,39 @@ public class App {
     private static String mulikaUrl = "https://mulika.natujenge.ke/api/statistics/report-list";
     private static String mulikaAPIKey = null;
     private static KPIConfig kpiConfig;
+    private static final Logger logger = LogManager.getLogger(App.class);
 
     public static void main(String[] args) {
         loadConfig();
 
-        System.out.println("About to start stats push thread");
+        logger.info("About to start stats push thread");
         mulikaThread = new Thread(() -> {
             while (true) {
                 try {
                     try {
-                        System.out.println("About to sleep for " + reportInterval + " milliseconds");
+                        logger.info("About to sleep for {} milliseconds", reportInterval);
                         Thread.sleep(reportInterval);
                     } catch (InterruptedException ex) {
-                        System.out.println("Thread could not sleep. trying again " + ex);
+                        logger.error("Thread could not sleep, trying again", ex);
                         Thread.sleep(reportInterval);
                     }
 
                     reportStats();
 
                 } catch (InterruptedException e) {
-                    System.out.println("received an interrupt signal " + e);
+                    logger.error("Received an interrupt signal", e);
                     break;
                 } catch (Exception ex) {
-                    System.out.println("Encountered exception. Proceeding " + ex);
+                    logger.error("Encountered exception. Proceeding", ex);
                 }
             }
         }, "mulika-thread");
 
-        System.out.println("Successfully initialized mulika thread");
+        logger.info("Successfully initialized mulika thread");
 
         mulikaThread.start();
 
-        System.out.println("Successfully started mulika thread. mulikaUrl = " + mulikaUrl + ", mulikaAPIKey = " + mulikaAPIKey);
+        logger.info("Successfully started mulika thread. mulikaUrl =  {}, mulikaAPIKey = {}", mulikaUrl, mulikaAPIKey);
     }
 
     private static void loadConfig() {
@@ -65,18 +68,18 @@ public class App {
         Properties properties = new Properties();
         String fileName = System.getenv().get("MULIKA_REPORTING_CONFIG");
         if (fileName != null) {
-            System.out.println("Environment variable is set to " + fileName + "|about to load properties");
+            logger.info("Environment variable is set to {}|about to load properties", fileName);
             try {
                 properties.load(Files.newInputStream(Paths.get(fileName)));
             } catch (IOException ex) {
-                System.out.println("encountered an error when loading properties " + ex);
+                logger.error("Encountered an error when loading properties", ex);
             }
         } else {
-            System.out.println("Environment variable is not set. Loading from " + ServiceConstants.DEFAULT_CONFIG_LOCATION + "/" + ServiceConstants.DEFAULT_CONFIG_FILE_NAME);
+            logger.info("Environment variable is not set. Loading from {}/{}", ServiceConstants.DEFAULT_CONFIG_LOCATION, ServiceConstants.DEFAULT_CONFIG_FILE_NAME);
             try {
                 properties.load(Files.newInputStream(Paths.get(ServiceConstants.DEFAULT_CONFIG_LOCATION + "/" + ServiceConstants.DEFAULT_CONFIG_FILE_NAME)));
             } catch (IOException ex) {
-                System.out.println("encountered an error when loading properties from " + ServiceConstants.DEFAULT_CONFIG_LOCATION + "/" + ServiceConstants.DEFAULT_CONFIG_FILE_NAME + "|about to load from class path");
+                logger.error("encountered an error when loading properties from {}/{}|about to load from class path", ServiceConstants.DEFAULT_CONFIG_LOCATION, ServiceConstants.DEFAULT_CONFIG_FILE_NAME, ex);
                 try {
                     properties.load(App.class.getClassLoader().getResourceAsStream(ServiceConstants.DEFAULT_CONFIG_FILE_NAME));
                 } catch (IOException e) {
@@ -111,8 +114,8 @@ public class App {
     private static void readSystemConfigs(Properties properties) {
         app = properties.getProperty(ServiceConstants.APP_CONFIG_KEY, app);
         module = properties.getProperty(ServiceConstants.MODULE_CONFIG_KEY, module);
-        reportInterval = Integer.parseInt(properties.getProperty(ServiceConstants.REPORT_INTERVAL_CONFIG_KEY), reportInterval);
-        serviceCount = Integer.parseInt(properties.getProperty(ServiceConstants.SERVICE_COUNT_CONFIG_KEY), serviceCount);
+        reportInterval = Integer.parseInt(properties.getProperty(ServiceConstants.REPORT_INTERVAL_CONFIG_KEY, String.valueOf(reportInterval)));
+        serviceCount = Integer.parseInt(properties.getProperty(ServiceConstants.SERVICE_COUNT_CONFIG_KEY, String.valueOf(serviceCount)));
         servicePrefix = properties.getProperty(ServiceConstants.SERVICE_PREFIX_CONFIG_KEY, servicePrefix);
         mulikaUrl = properties.getProperty(ServiceConstants.URL_CONFIG_KEY, mulikaUrl);
         mulikaAPIKey = properties.getProperty(ServiceConstants.API_KEY_CONFIG_KEY);
@@ -128,9 +131,9 @@ public class App {
 
             HTTPResponse response = HTTPClient.send(mulikaUrl, jsonRequest, "POST", "application/json", headers, 5000, 120000);
 
-            System.out.println("mulika|" + "|request :" + jsonRequest + "|response : " + response + "|stats sent");
+            logger.info("mulika|request : {}|response : {}|stats sent", jsonRequest, response);
         } catch (IOException e) {
-            System.out.println("mulika|Encountered exception" + e);
+            logger.error("mulika|encountered exception", e);
         }
     }
 
